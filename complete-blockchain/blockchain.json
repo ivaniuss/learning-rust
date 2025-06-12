@@ -1,0 +1,21 @@
+{
+  "chain": [
+    {
+      "index": 0,
+      "timestamp": "2025-06-11T21:09:40.567607Z",
+      "data": "Genesis Block",
+      "previous_hash": "0",
+      "hash": "b83e40dbd1206b2c46db1a4d5b08d7c300a1d879f05b85d6d4e3d0a65115b9e3",
+      "nonce": 0
+    },
+    {
+      "index": 1,
+      "timestamp": "2025-06-11T21:09:54.591665Z",
+      "data": "ivan 5 a raquel",
+      "previous_hash": "b83e40dbd1206b2c46db1a4d5b08d7c300a1d879f05b85d6d4e3d0a65115b9e3",
+      "hash": "79f609994c68a684a1e488299b90e71130964ddd5e5749ac1204b9c685f6fa1c",
+      "nonce": 0
+    }
+  ],
+  "difficulty": 2
+}
