@@ -19,9 +19,7 @@ struct Block {
 #[derive(Debug, Clone)]
 struct MiningStats {
     attempts: u64,
-    start_time: Instant,
     total_time: Duration,
-    hashes_per_second: f64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -113,9 +111,7 @@ impl Block {
                 
                 return MiningStats {
                     attempts,
-                    start_time: start,
                     total_time,
-                    hashes_per_second: hps,
                 };
             }
             
@@ -274,9 +270,7 @@ impl Blockchain {
         // Create a simplified MiningStats for competition
         let comp_stats = MiningStats {
             attempts: 0, // We don't track exact attempts in competition
-            start_time: Instant::now(), // Not used
             total_time: Duration::from_secs(0), // Not tracked
-            hashes_per_second: 0.0, // Not tracked
         };
         self.chain.push(mined_block);
         self.mining_stats.push((comp_stats, MiningMethod::Competition));
@@ -386,8 +380,14 @@ impl Blockchain {
         if !normal_stats.is_empty() {
             let total_attempts: u64 = normal_stats.iter().map(|s| s.attempts).sum();
             let avg_attempts = total_attempts as f64 / normal_stats.len() as f64;
-            let avg_hash_rate: f64 = normal_stats.iter().map(|s| s.hashes_per_second).sum::<f64>() / 
-                                    normal_stats.len() as f64;
+            
+            // Calculate average hash rate from attempts and time
+            let total_time_secs: f64 = normal_stats.iter().map(|s| s.total_time.as_secs_f64()).sum();
+            let avg_hash_rate = if total_time_secs > 0.0 {
+                total_attempts as f64 / total_time_secs
+            } else {
+                0.0
+            };
             
             println!("⚙️ Normal mining performance:");
             println!("   - Total hash attempts: {}", total_attempts);
@@ -434,7 +434,15 @@ fn main() {
                 io::stdin().read_line(&mut input).unwrap();
                 let data = input.trim().to_string();
                 let stats = blockchain.add_mined_block(data);
-                println!("Block mined in {} attempts ({:.2}s)", stats.attempts, stats.total_time.as_secs_f64());
+                let hash_rate = if stats.total_time.as_secs_f64() > 0.0 {
+                    stats.attempts as f64 / stats.total_time.as_secs_f64()
+                } else {
+                    0.0
+                };
+                println!("Block mined in {} attempts ({:.2}s, {:.0} H/s)", 
+                         stats.attempts, 
+                         stats.total_time.as_secs_f64(),
+                         hash_rate);
             }
             "2" => {
                 println!("Enter data for the new block:");
